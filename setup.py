@@ -54,7 +54,6 @@ REQUIRED_PKGS = [
     'tensorflow-metadata',
     'termcolor',
     'tqdm',
-    'wrapt',
     # Python 2 backports
     'bz2file;python_version<"3"',
     'functools32;python_version<"3"',
