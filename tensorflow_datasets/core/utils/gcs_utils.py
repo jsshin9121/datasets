@@ -32,16 +32,15 @@ GCS_DATASET_INFO_DIR = 'dataset_info'
 GCS_DATASETS_DIR = 'datasets'
 
 
-# TODO(tfds): On windows, gs:// isn't supported.
-# https://github.com/tensorflow/tensorflow/issues/38477
-_is_gcs_disabled = (os.name == 'nt')
-
-
 def exists(path: str) -> bool:
   """Checks if path exists. Returns False if issues occur connecting to GCS."""
   try:
     return tf.io.gfile.exists(path)
-  except tf.errors.FailedPreconditionError:
+  # * UnimplementedError: On windows, gs:// isn't supported.
+  # * FailedPreconditionError: Raised by TF
+  except (tf.errors.UnimplementedError, tf.errors.FailedPreconditionError):
+    # TODO(tfds): Investigate why windows, gs:// isn't supported.
+    # https://github.com/tensorflow/tensorflow/issues/38477
     return False
 
 
