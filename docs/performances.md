@@ -117,6 +117,28 @@ possible to opt-out of this feature with `tfds.ReadConfig`: either by setting
 `read_config.shuffle_seed` or overwriting
 `read_config.options.experimental_deterministic`.
 
+### Auto-shard your data across workers
+
+When training on multiple workers, you can use the `input_context` argument of
+`tfds.ReadConfig`, so each worker will read a subset of the data.
+
+```python
+input_context = tf.distribute.InputContext(
+    input_pipeline_id=1,  # Worker id
+    num_input_pipelines=4,  # Total number of workers
+)
+read_config = tfds.ReadConfig(
+    input_context=input_context,
+)
+ds = tfds.load('dataset', split='train', read_config=read_config)
+```
+
+Internally, this is done by adding a `ds.shard()` op after the files.
+
+Note: When using `tf.distribute.Strategy`, the `input_context` can be
+automatically created with
+[experimental_distribute_datasets_from_function](https://www.tensorflow.org/api_docs/python/tf/distribute/Strategy?version=nightly#experimental_distribute_datasets_from_function)
+
 ### Faster image decoding
 
 By default TFDS automatically decodes images. However, there are cases where it
